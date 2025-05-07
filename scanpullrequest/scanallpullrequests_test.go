@@ -3,10 +3,11 @@ package scanpullrequest
 import (
 	"context"
 	"fmt"
-	"github.com/jfrog/jfrog-cli-security/utils/xsc"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/jfrog/jfrog-cli-security/utils/xsc"
 
 	"github.com/golang/mock/gomock"
 	biutils "github.com/jfrog/build-info-go/utils"
@@ -41,6 +42,7 @@ type MockParams struct {
 
 //go:generate go run github.com/golang/mock/mockgen@v1.6.0 -destination=../testdata/vcsclientmock.go -package=testdata github.com/jfrog/froggit-go/vcsclient VcsClient
 func TestShouldScanPullRequestNewPR(t *testing.T) {
+	t.Parallel()
 	// Init mock
 	client := CreateMockVcsClient(t)
 	prID := 0
@@ -52,6 +54,7 @@ func TestShouldScanPullRequestNewPR(t *testing.T) {
 }
 
 func TestShouldScanPullRequestReScan(t *testing.T) {
+	t.Parallel()
 	// Init mock
 	client := CreateMockVcsClient(t)
 	prID := 0
@@ -65,6 +68,7 @@ func TestShouldScanPullRequestReScan(t *testing.T) {
 }
 
 func TestShouldNotScanPullRequestReScan(t *testing.T) {
+	t.Parallel()
 	// Init mock
 	client := CreateMockVcsClient(t)
 	prID := 0
@@ -79,6 +83,7 @@ func TestShouldNotScanPullRequestReScan(t *testing.T) {
 }
 
 func TestShouldNotScanPullRequest(t *testing.T) {
+	t.Parallel()
 	// Init mock
 	client := CreateMockVcsClient(t)
 	prID := 0
@@ -91,6 +96,7 @@ func TestShouldNotScanPullRequest(t *testing.T) {
 }
 
 func TestShouldNotScanPullRequestError(t *testing.T) {
+	t.Parallel()
 	// Init mock
 	client := CreateMockVcsClient(t)
 	prID := 0
@@ -101,6 +107,7 @@ func TestShouldNotScanPullRequestError(t *testing.T) {
 }
 
 func TestScanAllPullRequestsMultiRepo(t *testing.T) {
+	t.Parallel()
 	server, restoreEnv := utils.VerifyEnv(t)
 	defer restoreEnv()
 	xrayVersion, xscVersion, err := xsc.GetJfrogServicesVersion(&server)
@@ -167,6 +174,7 @@ func TestScanAllPullRequestsMultiRepo(t *testing.T) {
 }
 
 func TestScanAllPullRequests(t *testing.T) {
+	t.Parallel()
 	// This integration test, requires JFrog platform connection details
 	server, restoreEnv := utils.VerifyEnv(t)
 	defer restoreEnv()
