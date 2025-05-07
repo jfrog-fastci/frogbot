@@ -50,7 +50,7 @@ jobs:
   tests:
     needs: Pretest
     name: ${{ matrix.suite.name }} Tests (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ${{ matrix.os }}-latest-xl
     env:
       JFROG_CLI_LOG_LEVEL: "DEBUG"
       GRADLE_OPTS: -Dorg.gradle.daemon=false
