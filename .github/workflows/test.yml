@@ -5,6 +5,7 @@ on:
   # Triggers the workflow on labeled PRs only.
   pull_request_target:
     types: [labeled]
+  workflow_dispatch:
 
 # Ensures that only the latest commit is running for each PR at a time.
 # Ignores this rule for push events.
@@ -82,24 +83,13 @@ jobs:
           go-version: 1.23.x
           cache: false
 
-      - name: Go Cache Dependencies
+      - name: Go Cache
         uses: actions/cache@v3
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-      
-      - name: Go Cache Tests
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~\AppData\Local\go-build
-            ~/Library/Caches/go-build
-          key: ${{ runner.os }}-go-tests
-          restore-keys: |
-            ${{ runner.os }}-go-tests
 
       - name: Install npm
         uses: actions/setup-node@v3
@@ -125,11 +115,16 @@ jobs:
           nuget-version: 6.11.0
         if: runner.os == 'Linux'
 
-      - uses: awalsh128/cache-apt-pkgs-action@latest
+      - name: Install Mono on Linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apt-transport-https dirmngr gnupg ca-certificates
+          sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+          echo "deb https://download.mono-project.com/repo/ubuntu stable-focal main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+          sudo apt-get update
+          sudo apt-get install -y mono-complete
         if: runner.os == 'Linux'
-        with:
-          packages: apt-transport-https dirmngr gnupg ca-certificates mono-complete
-          version: 1.0
+        shell: 'bash'
 
       - name: Install Pnpm
         uses: pnpm/action-setup@v3
@@ -174,19 +169,9 @@ jobs:
         with:
           go-version: 1.23.x
           cache: false
-      - name: Go Cache Tests
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~\AppData\Local\go-build
-            ~/Library/Caches/go-build
-          key: ${{ runner.os }}-go-tests
-          restore-keys: |
-            ${{ runner.os }}-go-tests
 
       - name: Run Tests
-        run: GODEBUG=gocachehash=1 go test github_test.go integrationutils.go commands.go -v -race -timeout 30m -cover
+        run: go test github_test.go integrationutils.go commands.go -v -race -timeout 30m -cover
         env:
           JF_URL: ${{ secrets.PLATFORM_URL }}
           JF_ACCESS_TOKEN: ${{ secrets.PLATFORM_ADMIN_TOKEN }}
