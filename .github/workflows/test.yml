@@ -97,9 +97,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-godeps-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-go-
+            ${{ runner.os }}-godeps-
       
       - name: Go Cache Build & Tests
         uses: actions/cache@v4
@@ -108,10 +108,21 @@ jobs:
             ~/.cache/go-build
             ~\AppData\Local\go-build
             ~/Library/Caches/go-build
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-${{ hashFiles('**/*.go') }}
+          key: ${{ runner.os }}-gobuild-${{ hashFiles('**/go.sum') }}-${{ hashFiles('**/*.go') }}
           restore-keys: |
-            ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-
-            ${{ runner.os }}-go-
+            ${{ runner.os }}-gobuild-${{ hashFiles('**/go.sum') }}-
+            ${{ runner.os }}-gobuild-
+      
+      - name: Go Cache Mocks
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.config/go-generate-fast
+            ~\AppData\Local\go-generate-fast
+            ~/Library/Application Support/go-generate-fast
+          key: ${{ runner.os }}-gomocks
+          restore-keys: |
+            ${{ runner.os }}-gomocks
 
       - name: Install npm
         uses: actions/setup-node@v3
@@ -161,7 +172,9 @@ jobs:
 
       # Generate mocks
       - name: Generate mocks
-        run: go generate ./...
+        run: |
+          go install github.com/oNaiPs/go-generate-fast@latest
+          go-generate-fast ./...
 
       - name: Run Tests
         if: ${{ matrix.suite.name != 'GitHub Integration' || matrix.os == 'ubuntu' }}
