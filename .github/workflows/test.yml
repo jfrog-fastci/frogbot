@@ -112,6 +112,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gobuild-${{ hashFiles('**/go.sum') }}-
             ${{ runner.os }}-gobuild-
+      - name: Install go-generate-fast
+        run: go install github.com/oNaiPs/go-generate-fast
 
       - name: Go Cache Mocks
         uses: actions/cache@v4
